@@ -1,0 +1,25 @@
+{
+  "name": "image_to_ascii",
+  "version": "1.0.0",
+  "description": "Converts uploaded image to image made of ascii characters",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayangupta9/image-to-ascii-filter.git"
+  },
+  "author": "Ayan Gupta",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ayangupta9/image-to-ascii-filter/issues"
+  },
+  "homepage": "https://github.com/ayangupta9/image-to-ascii-filter#readme",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "multer": "^1.4.2",
+    "nodemon": "^2.0.12"
+  }
+}

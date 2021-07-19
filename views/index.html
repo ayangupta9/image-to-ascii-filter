@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="Description" content="Enter your description here" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- <link rel="stylesheet" href="assets/css/style.css"> -->
+    <title>Image to ascii</title>
+
+    <style>
+        canvas {
+            border: solid 1px black;
+            height: 400px;
+            width: 600px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5 mb-5 text-center">
+        <canvas id="canvas">
+        </canvas>
+        <img src="https://picsum.photos/id/1020/1350/900" alt="">
+        <br>
+        <!-- <p id="data" style="word-wrap: break-word; word-break: break-all;"></p> -->
+    </div>
+
+    <script>
+
+        let canvas, ctx;
+        let alreadyGreyScaled = false
+
+        document.addEventListener('DOMContentLoaded', e => {
+            canvas = document.getElementById('canvas')
+            ctx = canvas.getContext('2d')
+            canvas.width = 600;
+            canvas.height = 600;
+
+            let imgObj = new Image();
+            imgObj.src = 'https://picsum.photos/id/1020/1350/900'
+            imgObj.crossOrigin = "Anonymous";
+
+            let data;
+
+            imgObj.onload = function () {
+                let w = canvas.width
+                let nw = imgObj.naturalWidth
+                let nh = imgObj.naturalHeight
+                let aspect = nw / nh
+                let h = w / aspect
+                console.log('height', h);
+                canvas.height = h
+                ctx.drawImage(imgObj, 0, 0, w, h)
+                // data = ctx.getImageData(0, 0, w, h)
+                // console.log('done');
+                // console.log(data);
+            }
+
+            canvas.addEventListener('click', e => {
+                contrastfunc(e, 25)
+            })
+        })
+
+        const greyscale = function (e) {
+            if (alreadyGreyScaled) {
+                alert('Already GreyScaled')
+            } else {
+                data = ctx.getImageData(0, 0, canvas.width, canvas.height)
+                let arr = data.data
+                for (let i = 0; i < arr.length; i += 4) {
+                    let ttl = arr[i] + arr[i + 1] + arr[i + 2]
+                    let avg = parseInt(ttl / 3)
+
+                    arr[i] = avg
+                    arr[i + 1] = avg
+                    arr[i + 2] = avg
+                }
+
+                data.data = arr;
+                ctx.putImageData(data, 0, 0)
+                alreadyGreyScaled = true
+            }
+        }
+
+        const contrastfunc = function (e, contrast = 50) {
+            data = ctx.getImageData(0, 0, canvas.width, canvas.height)
+            let arr = data.data
+            contrast = (contrast / 100) + 1
+            let intercept = 128 * (1 - contrast)
+            for (let i = 0; i < arr.length; i += 4) {
+                arr[i] = arr[i] * contrast + intercept
+                arr[i + 1] = arr[i + 1] * contrast + intercept
+                arr[i + 2] = arr[i + 2] * contrast + intercept
+            }
+
+            data.data = arr;
+            ctx.putImageData(data, 0, 0)
+        }
+
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>
