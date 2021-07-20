@@ -8,13 +8,13 @@
     <meta name="Description" content="Enter your description here" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <!-- <link rel="stylesheet" href="assets/css/style.css"> -->
     <title>Image to ascii</title>
 
     <style>
         body {
             background-color: #333;
             color: white;
+            margin: 3em;
         }
 
         .toast-body {
@@ -23,15 +23,14 @@
 
         canvas {
             border: solid 1px black;
-            height: 400px;
-            width: 600px;
+            height: 50%;
+            width: 50%;
         }
 
         pre {
-            line-height: 8px;
-            /* height: 100%; */
-            width: 100%;
-            font-size: 10px;
+            line-height: 10px;
+            padding: 0;
+            overflow-y: hidden !important;
         }
 
         .toast {
@@ -39,29 +38,20 @@
             right: 10px;
             bottom: 10px;
         }
-
-        #textCanvas {
-            display: none;
-        }
     </style>
 </head>
 
 <body>
-    <div class="container mt-5 mb-5 text-center">
+    <div class="mt-5 mb-5 text-center">
         <canvas id="canvas">
         </canvas>
         <br>
         <br>
-        <!-- <img src="../public/assets/menuButtonImage.png" alt=""> -->
-        <img src="https://picsum.photos/id/1080/600/400" alt="">
+        <input type="button" class="btn btn-light copyBtn disabled" value="copy">
         <br>
         <br>
-        <input type="button" class="btn btn-light copyBtn" value="copy">
-        <br>
-        <br>
-        <div class="row">
+        <div class="row" id="containerResult">
             <pre id="ascii"></pre>
-            <canvas id="textCanvas"></canvas>
             <img id="imageToAscii" src="" alt="">
         </div>
 
@@ -77,8 +67,6 @@
     </div>
 
 
-
-
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
@@ -89,248 +77,75 @@
         const toastEle = document.querySelector('.toast')
         const copyButton = document.querySelector('.copyBtn')
         let imageToAscii = document.getElementById('imageToAscii')
-        copyButton.addEventListener('click', e => {
-            const el = document.createElement('textarea');
-            el.value = asciiImage.textContent;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-
-            // let textCanvas = document.getElementById('textCanvas').getContext('2d')
-            // let lines = asciiImage.textContent.split('\n')
-            // let y = 10;
-            // console.log(lines.length)
-            // for (let j = 0; j < lines.length; j++) {
-            //     textCanvas.fillText(lines[j], 0, y)
-            //     y += 10
-            // }
-
-            // console.log(lines);
-
-            // imageToAscii.src = textCanvas.canvas.toDataURL('image/png')
-            // console.log(imageToAscii.src);
-
-
-            html2canvas(document.getElementById("ascii"), {
-                scale: 10,
-                onrendered: function (cnv) {
-                    var screenshot = cnv.toDataURL("image/png");
-                    document.getElementById("imageToAscii").setAttribute("src", screenshot);
-                },
-            });
-            $('.toast').toast('show')
-        })
-
-        const canvas = document.getElementById('canvas');
+        let canvas = document.getElementById('canvas');
         let asciiImage = document.getElementById('ascii');
-        const context = canvas.getContext('2d')
+        let context = canvas.getContext('2d')
 
-        // let asciiResult = document.getElementById('data')
+        let imageData;
+        let imageWidth;
+        let imageHeight;
 
-        const toGrayScale = (r, g, b) => 0.21 * r + 0.72 * g + 0.07 * b;
-
-        const getFontRatio = () => {
-            const pre = document.createElement('pre')
-            pre.style.display = 'inline'
-            pre.textContent = ''
-
-            document.body.appendChild(pre)
-
-            console.log(asciiImage.getBoundingClientRect());
-
-            const { width, height } = pre.getBoundingClientRect();
-
-            console.log('57', width, height);
-            document.body.removeChild(pre)
-            return height / width
-        }
-
-        const convertToGreyScales = (context, width, height) => {
-            const imageData = context.getImageData(0, 0, width, height)
-            const greyScales = [];
-
-            contrast = (50 / 100) + 1
-            let intercept = 128 * (1 - contrast)
-
-            for (let i = 0; i < imageData.data.length; i += 4) {
-                const r = imageData.data[i];
-                const g = imageData.data[i + 1];
-                const b = imageData.data[i + 2];
-
-                const greyScale = toGrayScale(r, g, b)
-                imageData.data[i] = imageData.data[i + 1] = imageData.data[i + 2] = (greyScale * contrast) + intercept
-
-                greyScales.push(greyScale)
+        copyButton.addEventListener('click', async e => {
+            const data = {
+                'data': imageData.data.toString(),
+                'width': imageWidth,
+                'height': imageHeight
             }
 
-            context.putImageData(imageData, 0, 0)
-            return greyScales;
-        }
+            console.log(data);
+            const response = await fetch('/getImage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                // body: JSON.stringify(imageData.data),
+                body: JSON.stringify(data),
+            })
 
-        const MAXIMUM_WIDTH = 80;
-        const MAXIMUM_HEIGHT = 50;
+            const body = await response.text()
+            console.log(body);
+
+            asciiImage.textContent = body
+            // const el = document.createElement('textarea');
+            // el.value = asciiImage.textContent;
+            // document.body.appendChild(el);
+            // el.select();
+            // document.execCommand('copy');
+            // document.body.removeChild(el);
 
 
-        const clampDimensions = (width, height) => {
-            // const rectifiedWidth = Math.floor((getFontRatio() / 2) * width);
-            // console.log(rectifiedWidth);
-            if (height > MAXIMUM_HEIGHT) {
-                const reducedWidth = Math.floor(width * MAXIMUM_HEIGHT / height);
-                return [reducedWidth / 10, MAXIMUM_HEIGHT / 10];
-            }
-            if (width > MAXIMUM_WIDTH) {
-                const reducedHeight = Math.floor(height * MAXIMUM_WIDTH / width);
-                return [MAXIMUM_WIDTH / 10, reducedHeight / 10];
-            }
-            return [width / 10, height / 10];
-        };
+            // html2canvas(document.getElementById("ascii"), {
+            //     scale: window.devicePixelRatio * 10,
+            //     onrendered: function (cnv) {
+            //         var screenshot = cnv.toDataURL("image/png");
+            //         document.getElementById("imageToAscii").setAttribute("src", screenshot);
+            //     },
+            // });
 
-        // const clampDimensions = (width, height) => {
-        //     if (height > MAXIMUM_HEIGHT) {
-        //         const reducedWidth = Math.floor((width * MAXIMUM_HEIGHT) / height);
-        //         return [reducedWidth, MAXIMUM_HEIGHT];
-        //     }
-
-        //     if (width > MAXIMUM_WIDTH) {
-        //         const reducedHeight = Math.floor((height * MAXIMUM_WIDTH) / width);
-        //         return [MAXIMUM_WIDTH, reducedHeight];
-        //     }
-
-        //     return [width, height];
-        // };
-
-        // const clampDimensions = (width, height) => {
-        //     const rectifiedWidth = Math.floor(fontRatio * width);
-        //     console.log(rectifiedWidth);
-        //     if (height > MAXIMUM_HEIGHT) {
-        //         const reducedWidth = Math.floor(rectifiedWidth * MAXIMUM_HEIGHT / height)
-        //         console.log('90', reducedWidth);
-        //         return [reducedWidth, MAXIMUM_HEIGHT]
-        //     }
-
-        //     if (width > MAXIMUM_WIDTH) {
-        //         const reducedHeight = Math.floor(rectifiedWidth * MAXIMUM_WIDTH / rectifiedWidth)
-        //         console.log('96', reducedHeight);
-        //         return [MAXIMUM_WIDTH, reducedHeight]
-        //     }
-
-        //     return [rectifiedWidth, height]
-        // }
-
+            // $('.toast').toast('show')
+        })
 
         document.addEventListener('DOMContentLoaded', e => {
             let imgObj = new Image();
-            imgObj.src = 'https://picsum.photos/id/200/600/400'
+            imgObj.src = 'https://picsum.photos/id/190/600/400'
             imgObj.crossOrigin = "Anonymous";
 
             imgObj.onload = () => {
-                // const { width, height } = clampDimensions(imgObj.width, imgObj.height)
-                const width = Math.floor(imgObj.width / 2);
-                const height = Math.floor(imgObj.height / 2);
-                // console.log();
+                const width = Math.floor(imgObj.width / 2.75);
+                const height = Math.floor(imgObj.height / 2.75);
 
+                imageWidth = width
+                imageHeight = height
                 canvas.width = width;
                 canvas.height = height;
 
                 context.drawImage(imgObj, 0, 0, width, height);
-                const greyScales = convertToGreyScales(context, width, height)
-
-                drawAscii(greyScales, width)
+                imageData = context.getImageData(0, 0, width, height)
+                copyButton.classList.remove('disabled')
             }
         })
 
-        // const greyRamp = `$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,"^\`'.`;
-        const greyRamp = `.'\`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$`;
-        const rampLength = greyRamp.length
-
-        const getCharForGreyScale = greyScale => {
-            return greyRamp[Math.ceil(((rampLength - 1) * greyScale) / 255)];
-        }
-
-        const drawAscii = (greyScales, width) => {
-            const ascii = greyScales.reduce((asciiImage, grey, index) => {
-                let nextChars = getCharForGreyScale(grey)
-                // console.log(index);
-                if ((index + 1) % width === 0) {
-                    nextChars += "\n"
-                }
-                return asciiImage + nextChars
-            }, "")
-
-            asciiImage.textContent = ascii
-        }
-
-        // document.addEventListener('DOMContentLoaded', e => {
-        //     canvas = document.getElementById('canvas')
-        //     ctx = canvas.getContext('2d')
-        //     canvas.width = 600;
-        //     canvas.height = 600;
-
-        //     let imgObj = new Image();
-        //     // imgObj.src = 'https://picsum.photos/id/1020/1350/900'
-        //     imgObj.src = '../public/assets/small-intestine.png'
-        //     imgObj.crossOrigin = "Anonymous";
-
-        //     let data;
-
-        //     imgObj.onload = function () {
-        //         let w = canvas.width
-        //         let nw = imgObj.naturalWidth
-        //         let nh = imgObj.naturalHeight
-        //         let aspect = nw / nh
-        //         let h = w / aspect
-        //         console.log('height', h);
-        //         canvas.height = h
-        //         ctx.drawImage(imgObj, 0, 0, w, h)
-        //         // data = ctx.getImageData(0, 0, w, h)
-        //         // console.log('done');
-        //         // console.log(data);
-        //     }
-
-        //     canvas.addEventListener('click', e => {
-        //         let answer = greyscale(e)
-        //         console.log(answer);
-        //         drawAscii(answer, canvas.width)
-        //     })
-        // })
-
-        // const greyscale = function (e) {
-        //     if (alreadyGreyScaled) {
-        //         alert('Already GreyScaled')
-        //     } else {
-        //         data = ctx.getImageData(0, 0, canvas.width, canvas.height)
-        //         let arr = data.data
-        //         for (let i = 0; i < arr.length; i += 4) {
-        //             let ttl = arr[i] + arr[i + 1] + arr[i + 2]
-        //             let avg = parseInt(ttl / 3)
-
-        //             arr[i] = avg
-        //             arr[i + 1] = avg
-        //             arr[i + 2] = avg
-        //         }
-
-        //         data.data = arr;
-        //         ctx.putImageData(data, 0, 0)
-        //         alreadyGreyScaled = true
-        //     }
-        //     return data.data
-        // }
-
-        // const contrastfunc = function (e, contrast = 50) {
-        //     data = ctx.getImageData(0, 0, canvas.width, canvas.height)
-        //     let arr = data.data
-        //     contrast = (contrast / 100) + 1
-        //     let intercept = 128 * (1 - contrast)
-        //     for (let i = 0; i < arr.length; i += 4) {
-        //         arr[i] = arr[i] * contrast + intercept
-        //         arr[i + 1] = arr[i + 1] * contrast + intercept
-        //         arr[i + 2] = arr[i + 2] * contrast + intercept
-        //     }
-
-        //     data.data = arr;
-        //     ctx.putImageData(data, 0, 0)
-        // }
 
     </script>
 
