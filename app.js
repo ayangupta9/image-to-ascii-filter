@@ -2,6 +2,8 @@ const express = require('express')
 const multer = require('multer')
 const ejs = require('ejs')
 const path = require('path')
+// const textToImage = require('text-to-image')
+// const fs = require('fs')
 
 const app = express()
 
@@ -11,7 +13,7 @@ app.use(
   express.json({ type: ['application/json', 'text/plain'], limit: '50mb' })
 )
 
-const greyRamp = ' _.,:~=+°*aev?#%@$░▒▓█'.split('')
+const greyRamp = ' ._-`°*~=+aev?#@$░▒▓'.split('')
 
 const rampLength = greyRamp.length
 
@@ -55,7 +57,7 @@ const drawAscii = (greyScales, width) => {
   return asciiResult
 }
 
-app.post('/getImage', (req, res) => {
+app.post('/getImage', async (req, res) => {
   if (req.body) {
     console.log('receieved data')
   }
@@ -66,8 +68,20 @@ app.post('/getImage', (req, res) => {
 
   let greyScales = convertToGreyScales(imageData, width, height)
   const asciiFinal = drawAscii(greyScales, width)
+  // const dataUri = await textToImage.generate(asciiFinal, {
+  //   lineHeight: 3,
+  //   fontSize: 3
+  // })
+  // console.log(dataUri)
 
-  res.send(asciiFinal)
+  const sendBack = {
+    textResult: asciiFinal
+    // imageResult: dataUri
+  }
+  // fs.writeFileSync(path.join(__dirname, 'public/assets/result.png'), dataUri)
+  // res.send(asciiFinal)
+
+  res.json(sendBack)
 })
 
 app.get('/', (req, res) => {

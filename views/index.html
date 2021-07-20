@@ -28,8 +28,12 @@
         }
 
         pre {
-            line-height: 10px;
+            line-height: 9px;
+            letter-spacing: 1.5px;
             padding: 0;
+            font-size: 9px;
+            background-color: black;
+            color: white;
             overflow-y: hidden !important;
         }
 
@@ -38,6 +42,15 @@
             right: 10px;
             bottom: 10px;
         }
+
+        /* #testascii {
+            display: hidden;
+            line-height: 6px;
+            letter-spacing: 1.0px;
+            padding: 0;
+            font-size: 6px;
+            color: white;
+        } */
     </style>
 </head>
 
@@ -48,24 +61,25 @@
         <br>
         <br>
         <input type="button" class="btn btn-light copyBtn disabled" value="copy">
+        <input type="button" class="btn btn-light imageBtn disabled" value="Create Image">
+        <input type="button" class="btn btn-light createAscii disabled" value="Create ASCII">
         <br>
         <br>
         <div class="row" id="containerResult">
             <pre id="ascii"></pre>
+            <pre id="testascii"></pre>
             <img id="imageToAscii" src="" alt="">
         </div>
 
         <div class="toast" data-autohide="true" animate="true" id="myToast">
             <div class="toast-header">
                 <strong class="mr-auto"><i class="fa fa-grav"></i> Copied to Clipboard!</strong>
-
             </div>
             <div class="toast-body">
                 paste anywhere you like!
             </div>
         </div>
     </div>
-
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -76,16 +90,21 @@
 
         const toastEle = document.querySelector('.toast')
         const copyButton = document.querySelector('.copyBtn')
+        const imageButton = document.querySelector('.imageBtn')
+        const createAsciiButton = document.querySelector('.createAscii')
         let imageToAscii = document.getElementById('imageToAscii')
         let canvas = document.getElementById('canvas');
         let asciiImage = document.getElementById('ascii');
         let context = canvas.getContext('2d')
+        // let testCanvas = document.getElementById('testascii')
 
         let imageData;
         let imageWidth;
         let imageHeight;
 
-        copyButton.addEventListener('click', async e => {
+        createAsciiButton.addEventListener('click', async e => {
+            imageButton.classList.remove('disabled')
+
             const data = {
                 'data': imageData.data.toString(),
                 'width': imageWidth,
@@ -99,36 +118,47 @@
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                // body: JSON.stringify(imageData.data),
                 body: JSON.stringify(data),
             })
 
-            const body = await response.text()
-            console.log(body);
+            const body = await response.json()
+            asciiImage.textContent = body.textResult
+        })
 
-            asciiImage.textContent = body
-            // const el = document.createElement('textarea');
-            // el.value = asciiImage.textContent;
-            // document.body.appendChild(el);
-            // el.select();
-            // document.execCommand('copy');
-            // document.body.removeChild(el);
+        imageButton.addEventListener('click', async e => {
+            // asciiImage.style.fontSize = '6px'
+            // asciiImage.style.lineHeight = '6px'
+            // asciiImage.style.letterSpacing = '1px'
+            html2canvas(asciiImage, {
+                scale: 2,
+                onrendered: function (cnv) {
+                    var screenshot = cnv.toDataURL("image/png");
+                    document.getElementById('imageToAscii').setAttribute('src', screenshot)
+                },
+            });
 
+            // asciiImage.style.fontSize = '3px'
+            // asciiImage.style.lineHeight = '3px'
+            // asciiImage.style.letterSpacing = '0.5px'
+        })
 
-            // html2canvas(document.getElementById("ascii"), {
-            //     scale: window.devicePixelRatio * 10,
-            //     onrendered: function (cnv) {
-            //         var screenshot = cnv.toDataURL("image/png");
-            //         document.getElementById("imageToAscii").setAttribute("src", screenshot);
-            //     },
-            // });
+        copyButton.addEventListener('click', async e => {
 
-            // $('.toast').toast('show')
+            const el = document.createElement('textarea');
+            el.value = asciiImage.textContent;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            $('.toast').toast('show')
         })
 
         document.addEventListener('DOMContentLoaded', e => {
             let imgObj = new Image();
-            imgObj.src = 'https://picsum.photos/id/190/600/400'
+            imgObj.src = 'https://picsum.photos/id/88/600/400'
+            // imgObj.src = 'https://www.logogenie.net/images/articles/why-you-need-a-black-and-white-logo3.jpg'
+            // imgObj.src = "../public/assets/o.png"
             imgObj.crossOrigin = "Anonymous";
 
             imgObj.onload = () => {
@@ -143,6 +173,7 @@
                 context.drawImage(imgObj, 0, 0, width, height);
                 imageData = context.getImageData(0, 0, width, height)
                 copyButton.classList.remove('disabled')
+                createAsciiButton.classList.remove('disabled')
             }
         })
 
