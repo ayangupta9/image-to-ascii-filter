@@ -1,0 +1,40 @@
+body {
+  background-color: #333;
+  color: white;
+  margin: 3em;
+}
+
+.toast-body {
+  color: #333;
+}
+
+canvas {
+  border: solid 1px black;
+  height: 50%;
+  width: 50%;
+}
+
+pre {
+  line-height: 3px;
+  letter-spacing: 0.5px;
+  padding: 0;
+  font-size: 3px;
+  background-color: black;
+  color: white;
+  overflow-y: hidden !important;
+}
+
+.toast {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+}
+
+/* #testascii {
+    display: hidden;
+    line-height: 6px;
+    letter-spacing: 1.0px;
+    padding: 0;
+    font-size: 6px;
+    color: white;
+} */

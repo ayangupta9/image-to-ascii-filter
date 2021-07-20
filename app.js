@@ -2,19 +2,28 @@ const express = require('express')
 const multer = require('multer')
 const ejs = require('ejs')
 const path = require('path')
-// const textToImage = require('text-to-image')
-// const fs = require('fs')
 
 const app = express()
 
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, '/public')))
 app.use(express.urlencoded({ extended: false, limit: '50mb' }))
 app.use(
   express.json({ type: ['application/json', 'text/plain'], limit: '50mb' })
 )
+app.set('view engine', 'ejs')
+
+const storage = multer.diskStorage({
+  destination: './public/uploads/',
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+
+const upload = multer({
+  storage: storage
+}).single('uploadedImg')
 
 const greyRamp = ' ._-`°*~=+aev?#@$░▒▓'.split('')
-
 const rampLength = greyRamp.length
 
 let asciiResult = ''
@@ -68,23 +77,36 @@ app.post('/getImage', async (req, res) => {
 
   let greyScales = convertToGreyScales(imageData, width, height)
   const asciiFinal = drawAscii(greyScales, width)
-  // const dataUri = await textToImage.generate(asciiFinal, {
-  //   lineHeight: 3,
-  //   fontSize: 3
-  // })
-  // console.log(dataUri)
 
   const sendBack = {
     textResult: asciiFinal
-    // imageResult: dataUri
   }
-  // fs.writeFileSync(path.join(__dirname, 'public/assets/result.png'), dataUri)
-  // res.send(asciiFinal)
 
   res.json(sendBack)
 })
 
+app.post('/upload', (req, res) => {
+  upload(req, res, err => {
+    if (err) {
+      console.log('Encountered error!', err)
+    } else {
+      if (req.file == undefined) {
+        console.log('Encountered Error')
+      } else {
+        console.log(req.file)
+        // res.render('index', {
+        //   msg: 'File Uploaded',
+        //   file: `/uploads/${req.file.filename}`
+        // })
+      }
+      // console.log(req.file)
+      // res.send('Received')
+    }
+  })
+})
+
 app.get('/', (req, res) => {
+  // res.render('index')
   res.sendFile(path.join(__dirname, 'views/index.html'))
 })
 
