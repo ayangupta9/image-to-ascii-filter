@@ -8,25 +8,52 @@
     <meta name="Description" content="Enter your description here" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <!-- <link rel="stylesheet" href="assets/css/style.css"> -->
-    <title>Ascii Result</title>
+    <link rel="stylesheet" type="text/css" href="/assets/asciiResultStyles.css">
+    <title>ASCII Result</title>
 </head>
 
 <body>
-    <div class="container-fluid mb-4 mt-4">
+    <%- include ('./partials/info.ejs') %>
+        <div class="container justify-content-center ml-6 mr-6 text-center mb-4 mt-4">
+            <div class="fixedTop mt-5">
+                <div class="col-6 serverFileWrapper">
+                    <img id="serverFile" src="<%= typeof file != 'undefined' ? file : '' %>" alt="Uploaded image">
+                </div>
+                <div class="col-6 align-content-center buttonContainer flex-column p-5">
+                    <input type="button" class="btn btn-light copyBtn disabled" value="Copy">
+                    <input type="button" class="btn btn-light imageBtn disabled" value="Create Image">
+                    <input type="button" class="btn btn-light createAscii disabled" value="Create ASCII">
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row resultContainer">
+                <div class="section1">
+                    <h1 class="display-3 text-center">ASCII RESULT</h1>
+                    <pre id="asciiImage">
+                        </pre>
+                </div>
+                <div class="section2">
+                    <h1 class="display-3 text-center">IMAGE RESULT</h1>
+                </div>
+            </div>
+            <%- include ('./partials/toast.ejs', {toastId: 'mytoast1' ,headerMsg: 'ASCII Created!'
+                ,bodyMsg: 'Hope you like it!' }) %>
 
-        <div class="row">
-            <br>
-            <input type="button" class="btn btn-light copyBtn disabled" value="copy">
-            <input type="button" class="btn btn-light imageBtn disabled" value="Create Image">
-            <input type="button" class="btn btn-light createAscii disabled" value="Create ASCII">
-            <br>
+                <%- include ('./partials/toast.ejs', {toastId: 'mytoast2' ,headerMsg: 'ASCII Copied!'
+                    ,bodyMsg: 'Paste it where you like!' }) %>
+
+                    <%- include ('./partials/toast.ejs', {toastId: 'mytoast3' ,headerMsg: 'Image created from ASCII!'
+                        ,bodyMsg: 'Save it wherever you like!' }) %>
         </div>
-    </div>
 
-    <script type="text/javascript" src="/public/client/asciiResult.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/client/asciiResult.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/js/bootstrap.min.js"></script>
 </body>
 
 </html>

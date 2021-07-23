@@ -1,0 +1,91 @@
+#serverFile {
+  width: 50%;
+}
+
+body {
+  background-color: #333;
+  color: white;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.buttonContainer > input {
+  margin: 1em;
+}
+
+#asciiImage {
+  line-height: 4.5px;
+  letter-spacing: 1.35px;
+  padding: 0;
+  margin: 0;
+  font-size: 4.95px;
+  background-color: black;
+  color: white;
+  overflow-y: hidden !important;
+}
+
+@media (max-width: 760px) {
+  #asciiImage {
+    margin: 0;
+    line-height: 3.9px;
+    letter-spacing: 0.9px;
+    font-size: 4.29px;
+    padding: 0;
+    background-color: black;
+    color: white;
+    overflow-y: hidden !important;
+  }
+}
+
+.resultContainer {
+  visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.section1 {
+  flex: 1;
+}
+
+.section2 {
+  flex: 1;
+}
+
+.section2 > h1 {
+  visibility: hidden;
+}
+
+.toast {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+}
+
+.toast-body {
+  color: #333;
+}
+
+.fixedTop {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .fixedTop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.serverFileWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
