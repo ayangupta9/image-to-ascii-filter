@@ -1,12 +1,12 @@
-#IMAGE TO ASCII (WEB)
+# IMAGE TO ASCII (WEB)
 
-###Upload any image and convert into ASCII art
+### Upload any image and convert into ASCII art
 
 - Used Multer to upload images and save the same in '/public/uploads'
 - Create image of ASCII art using html2canvas
 - Server made with Express and Node
 
-##Screenshots
+## Screenshots
 
 <img src="./screenshots/ss1.jpeg" alt="Screenshot1" width="400px">
 <img src="./screenshots/ss2.jpeg" alt="Screenshot2" width="400px">
